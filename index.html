@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DiscoTools</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #2c2f33;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    nav {
+      background: #23272a;
+      display: flex;
+      flex-direction: column;
+      width: 200px;
+      height: 100vh;
+      position: fixed;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    nav button {
+      background: #7289da;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px 0;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+      text-align: left;
+    }
+    nav button:hover { background: #5b6eae; }
+    nav button#themeToggleBtn {
+      background: none;
+      font-size: 18px;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .main {
+      margin-left: 220px;
+      padding: 20px;
+    }
+    .tool { display: none; }
+    .active { display: block; }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+      background: #99aab5;
+      border: none;
+      color: #000;
+      border-radius: 4px;
+    }
+    button.send {
+      background: #43b581;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      margin-top: 5px;
+      border-radius: 4px;
+    }
+    .output-box {
+      background: #ffffff10;
+      border: 1px solid #7289da;
+      padding: 10px;
+      margin-top: 10px;
+      white-space: pre-wrap;
+      border-radius: 4px;
+    }
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #23272a;
+    }
+    .login-screen button {
+      margin: 10px;
+      padding: 10px 20px;
+      background: #7289da;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .login-screen button i {
+      margin-right: 8px;
+    }
+    .light-mode {
+      background: #f5f5f5;
+      color: #000;
+    }
+    .light-mode nav {
+      background: #ddd;
+    }
+    .light-mode .output-box {
+      background: #eee;
+      border-color: #ccc;
+      color: #000;
+    }
+  </style>
+</head>
+<body class="dark-mode">
+<div id="login" class="login-screen">
+  <h1>Welcome to DiscoTools</h1>
+  <button onclick="login('google')"><i class="fab fa-google"></i>Sign in with Google</button>
+  <button onclick="login('discord')"><i class="fab fa-discord"></i>Sign in with Discord</button>
+  <button onclick="login('github')"><i class="fab fa-github"></i>Sign in with GitHub</button>
+</div>
+
+<div id="main-content" style="display:none">
+  <nav>
+    <button onclick="showTool('formatter')">Message Formatter</button>
+    <button onclick="showTool('status')">Bot Status Preview</button>
+    <button onclick="showTool('autoReply')">Auto Replier Designer</button>
+    <button onclick="showTool('webhook')">Advanced Webhook Tool</button>
+    <button onclick="showTool('scheduler')">Message Scheduler</button>
+    <button onclick="showTool('inviteGen')">Invite Link Generator</button>
+    <button onclick="showTool('embedDesigner')">Embed Message Designer</button>
+    <button onclick="showTool('analyzer')">Message Analyzer</button>
+    <button onclick="showTool('tutorial')">Tutorial</button>
+    <button onclick="showTool('credits')">Credits</button>
+    <button onclick="window.open('https://discord.gg/bS92AnUeUr', '_blank')"><i class="fab fa-discord"></i> Join our Discord!</button>
+    <button id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-sun"></i></button>
+  </nav>
+
+  <div class="main">
+    <div id="formatter" class="tool active">
+      <h2>Message Formatter</h2>
+      <textarea id="msgRaw" placeholder="Enter message with formatting..."></textarea>
+      <button onclick="formatMessage()" class="send">Format</button>
+      <div class="output-box" id="msgFormatted"></div>
+    </div>
+
+    <div id="status" class="tool"><h2>Bot Status Preview</h2>
+      <select id="statusType">
+        <option>Playing</option>
+        <option>Listening to</option>
+        <option>Watching</option>
+        <option>Streaming</option>
+      </select>
+      <input id="statusText" placeholder="Status text...">
+      <button onclick="previewStatus()" class="send">Preview</button>
+      <div class="output-box" id="statusOutput"></div>
+    </div>
+
+    <div id="autoReply" class="tool"><h2>Auto Replier Designer</h2>
+      <input id="trigger" placeholder="If message contains...">
+      <input id="response" placeholder="Auto reply with...">
+      <button onclick="addAutoReply()" class="send">Add</button>
+      <div class="output-box" id="autoReplyList"></div>
+    </div>
+
+    <div id="webhook" class="tool"><h2>Advanced Webhook Sender</h2>
+      <input id="whUrl" placeholder="Webhook URL">
+      <input id="whName" placeholder="Username">
+      <input id="whAvatar" placeholder="Avatar URL">
+      <textarea id="whMsg" placeholder="Message..."></textarea>
+      <button onclick="sendAdvancedWebhook()" class="send">Send</button>
+      <div class="output-box" id="whResult"></div>
+    </div>
+
+    <div id="scheduler" class="tool"><h2>Message Scheduler</h2>
+      <input id="schedTime" type="datetime-local">
+      <textarea id="schedMsg" placeholder="Scheduled message..."></textarea>
+      <button onclick="scheduleMsg()" class="send">Schedule</button>
+      <div class="output-box" id="schedResult"></div>
+    </div>
+
+    <div id="inviteGen" class="tool"><h2>Invite Link Generator</h2>
+      <input id="serverID" placeholder="Server ID...">
+      <button onclick="generateInvite()" class="send">Generate</button>
+      <div class="output-box" id="inviteOutput"></div>
+    </div>
+
+    <div id="embedDesigner" class="tool"><h2>Embed Message Designer</h2>
+      <input id="embedTitle" placeholder="Title">
+      <textarea id="embedDesc" placeholder="Description"></textarea>
+      <button onclick="generateEmbed()" class="send">Create Embed</button>
+      <div class="output-box" id="embedOutput"></div>
+    </div>
+
+        <div id="credits" class="tool"><h2>Credits</h2>
+      <div class="output-box" style="text-align:center;">
+        Super Aaranya [Person who scripted DiscoTools]<br>
+        Steve [Owner]<br>
+        TheEndy [Owner]
+      </div>
+    </div>
+
+    <div id="tutorial" class="tool"><h2>DiscoTools Tutorial</h2>
+      <div class="output-box" id="tutorialSteps"></div>
+      <button onclick="nextTutorialStep()" class="send">Next</button>
+    </div>
+
+    <div id="analyzer" class="tool"><h2>Message Analyzer</h2>
+      <textarea id="analyzeInput" placeholder="Enter a message..."></textarea>
+      <button onclick="analyzeMsg()" class="send">Analyze</button>
+      <div class="output-box" id="analyzeOutput"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let loggedInWith = null;
+  let tutorialIndex = 0;
+  const tutorialSteps = [
+  "Welcome to DiscoTools! Let’s take a tour of the features.",
+  "🛠️ Message Formatter: Format Discord messages with bold, italics, strikethrough, and more.",
+  "🎮 Bot Status Preview: Simulate what your bot's activity status will look like.",
+  "🤖 Auto Replier Designer: Set custom replies based on message triggers.",
+  "📣 Advanced Webhook Tool: Send messages as a bot using a webhook URL.",
+  "⏰ Message Scheduler: Plan messages to send at specific times.",
+  "🔗 Invite Link Generator: Generate a preview of a Discord invite link using a Server ID.",
+  "🖼️ Embed Message Designer: Create beautiful embedded message previews.",
+  "🧠 Message Analyzer: Analyze message length, mentions, and emoji usage.",
+  "🎓 Tutorial: You're here now! Click Next to continue through steps.",
+  "📃 Credits: See who made DiscoTools possible.",
+  "💬 Join our Discord: Open our community server to ask questions or hang out!",
+  "🌗 Theme Toggle: Use the sun/moon icon to switch between light and dark mode.",
+  "✅ Done! Now you're ready to explore DiscoTools. Have fun!"
+];
+
+  function nextTutorialStep() {
+    if (tutorialIndex < tutorialSteps.length) {
+      document.getElementById("tutorialSteps").textContent = tutorialSteps[tutorialIndex++];
+    } else {
+      document.getElementById("tutorial").classList.remove("active");
+    }
+  }
+
+  function login(method) {
+    window.open(
+      method === 'discord' ? 'https://discord.com/login' :
+      method === 'google' ? 'https://accounts.google.com' :
+      'https://github.com/login', '_blank'
+    );
+    setTimeout(() => {
+      loggedInWith = method;
+      document.getElementById("login").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+    }, 500);
+  }
+
+  function showTool(id) {
+    document.querySelectorAll('.tool').forEach(e => e.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function toggleTheme() {
+    const body = document.body;
+    const btnIcon = document.querySelector("#themeToggleBtn i");
+    if (body.classList.contains("dark-mode")) {
+      body.classList.replace("dark-mode", "light-mode");
+      btnIcon.className = "fas fa-moon";
+    } else {
+      body.classList.replace("light-mode", "dark-mode");
+      btnIcon.className = "fas fa-sun";
+    }
+  }
+
+  function formatMessage() {
+    const text = document.getElementById("msgRaw").value;
+    const preview = text
+      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+      .replace(/\*(.*?)\*/g, '<i>$1</i>')
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/~~(.*?)~~/g, '<s>$1</s>')
+      .replace(/@(everyone|here)/g, '<mark>@$1</mark>')
+      .replace(/\n/g, '<br>');
+    document.getElementById("msgFormatted").innerHTML = preview;
+  }
+
+  function previewStatus() {
+    const type = document.getElementById("statusType").value;
+    const text = document.getElementById("statusText").value;
+    document.getElementById("statusOutput").textContent = `${type} ${text}`;
+  }
+
+  const autoReplies = [];
+  function addAutoReply() {
+    const trigger = document.getElementById("trigger").value;
+    const response = document.getElementById("response").value;
+    if (trigger && response) {
+      autoReplies.push({ trigger, response });
+      document.getElementById("autoReplyList").textContent = autoReplies.map(r => `If "${r.trigger}" → "${r.response}"`).join("\n");
+    }
+  }
+
+  function sendAdvancedWebhook() {
+    const url = document.getElementById("whUrl").value;
+    const name = document.getElementById("whName").value;
+    const avatar = document.getElementById("whAvatar").value;
+    const content = document.getElementById("whMsg").value;
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: name, avatar_url: avatar, content })
+    }).then(res => {
+      document.getElementById("whResult").textContent = res.ok ? "✅ Sent" : "❌ Failed to send";
+    });
+  }
+
+  function scheduleMsg() {
+    const time = document.getElementById("schedTime").value;
+    const msg = document.getElementById("schedMsg").value;
+    document.getElementById("schedResult").textContent = `Scheduled "${msg}" for ${time}`;
+  }
+
+  function generateInvite() {
+    const id = document.getElementById("serverID").value;
+    const fakeLink = `https://discord.gg/${id.slice(0, 6)}123`;
+    document.getElementById("inviteOutput").textContent = `Invite Link: ${fakeLink}`;
+  }
+
+  function generateEmbed() {
+    const title = document.getElementById("embedTitle").value;
+    const desc = document.getElementById("embedDesc").value;
+    document.getElementById("embedOutput").innerHTML = `<b>${title}</b><br><i>${desc}</i>`;
+  }
+
+  function analyzeMsg() {
+    const input = document.getElementById("analyzeInput").value;
+    const length = input.length;
+    const mentions = (input.match(/<@!?.*?>/g) || []).length;
+    const emojiCount = (input.match(/:[a-z_]+:/g) || []).length;
+    document.getElementById("analyzeOutput").textContent = `Length: ${length}\nMentions: ${mentions}\nCustom Emojis: ${emojiCount}`;
+  }
+</script>
+</body>
+</html>
